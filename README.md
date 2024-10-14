@@ -3,7 +3,7 @@
 ## Step: 1 
 Download the repo by following command :
 ```json
- git clone https://github.com/Abu-Rayhan-66/Sports-facility-server
+ git clone https://github.com/Abu-Rayhan-66/Dish-Directory-server
  ```
 
 ## Step: 2
@@ -28,5 +28,4 @@ Run this command to start your server locally.
 If you follow these steps you can run the server locally.  
 
 
-## live link
-https://assignment-3-ten-chi.vercel.app
+

@@ -12,11 +12,11 @@ import path from "path";
 const app: Application = express();
 
 app.use(express.static(path.join(__dirname,"../public")))
-//parsers
+
 app.use(express.json());
 
-// app.use(cors({origin:"https://sport-facility.netlify.app", credentials:true}));
 app.use(cors({origin:"http://localhost:3000", credentials:true}));
+// app.use(cors({origin:"https://dish-directory-client.vercel.app", credentials:true}));
 
 // application routes
 app.use("/api", router);

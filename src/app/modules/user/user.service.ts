@@ -61,7 +61,7 @@ const updateUserProfileIntoDb = async (userId: string, updateData: Partial<TUser
     throw new Error('User not found!');
   }
 
-  // If email is being updated, ensure it's unique
+ 
   if (updateData.email) {
     const existingUser = await UserModel.findOne({ email: updateData.email });
     if (existingUser && existingUser._id.toString() !== userId) {
@@ -84,25 +84,25 @@ const addToFollowingIntoDb = async (id: string, user: JwtPayload) => {
   if (!currentUser) {
     throw new Error('Current user not found!');
   }
-  // Check if the user is already following the target user
+
   if (currentUser.following.includes(id)) {
     throw new Error('You are already following this user.');
   }
 
-  // Push the new user to the 'following' array using $addToSet to prevent duplicates
+
   const updatedUser = await UserModel.findByIdAndUpdate(
     user.id,
     {
       $addToSet: { following: id },
     },
-    { new: true }, // Return the updated document
+    { new: true }, 
   );
 
   if (!updatedUser) {
     throw new Error('Failed to update following list.');
   }
 
-  // Also add the current user to the 'followers' field of the target user
+
   await UserModel.findByIdAndUpdate(id, {
     $addToSet: { followers: user.id },
   });
@@ -117,25 +117,24 @@ const removeFromFollowingIntoDb = async (id: string, user: JwtPayload) => {
     throw new Error('Current user not found!');
   }
 
-  // Check if the user is following the target user
   if (!currentUser.following.includes(id)) {
     throw new Error('You are not following this user.');
   }
 
-  // Remove the target user from the 'following' array of the current user
+
   const updatedUser = await UserModel.findByIdAndUpdate(
     user.id,
     {
       $pull: { following: id },
     },
-    { new: true }, // Return the updated document
+    { new: true }, 
   );
 
   if (!updatedUser) {
     throw new Error('Failed to update following list.');
   }
 
-  // Also remove the current user from the 'followers' field of the target user
+
   await UserModel.findByIdAndUpdate(id, {
     $pull: { followers: user.id },
   });
@@ -213,6 +212,12 @@ const getAllAdminFromDb = async () => {
   return result;
 };
 
+const getSingleAdminFromDb = async (id:string) => {
+  const result = await UserModel.findOne({ role: 'admin', _id:id });
+
+  return result;
+};
+
 
 const updateAdminProfileIntoDb = async (
   userId: string,
@@ -224,7 +229,7 @@ const updateAdminProfileIntoDb = async (
     throw new Error('User not found!');
   }
 
-  // If email is being updated, ensure it's unique
+
   if (updateData.email) {
     const existingUser = await UserModel.findOne({ email: updateData.email });
     if (existingUser && existingUser._id.toString() !== userId) {
@@ -260,6 +265,7 @@ export const UserServices = {
   deleteUserFromDb,
   createAdminIntoDb,
   getAllAdminFromDb,
+  getSingleAdminFromDb,
   updateAdminProfileIntoDb,
   deleteAdminFromDb
 

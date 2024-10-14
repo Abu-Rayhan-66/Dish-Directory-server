@@ -156,6 +156,15 @@ const createUser = catchAsync(async (req, res)=>{
       data: result,
     });
   });
+ const getSingleAdmin = catchAsync(async (req, res) => {
+    const result = await UserServices.getSingleAdminFromDb(req.params.id);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "Single admin retrieve successfully",
+      data: result,
+    });
+  });
 
  const updateAdmin = catchAsync(async (req, res) => {
     const result = await UserServices.updateAdminProfileIntoDb(req.params.id, req.body);
@@ -194,6 +203,7 @@ export const UserController = {
     deleteUser,
     createAdmin,
     getAllAdmin,
+    getSingleAdmin,
     updateAdmin,
     deleteAdmin
 

@@ -19,7 +19,7 @@ export const auth = (...requiredRoles: Role[]) =>
       });
 
     const decoded = jwt.verify(token, config.jwt_access_secret as string) as JwtPayload;
-    console.log('Decoded JWT:', decoded); // Log the decoded token to check
+    console.log('Decoded JWT:', decoded); 
     if (requiredRoles && !requiredRoles.includes(decoded.role)) {
       return res.status(httpStatus.UNAUTHORIZED).json({
         success: false,
