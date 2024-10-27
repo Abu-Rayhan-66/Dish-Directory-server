@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-
 import config from "../../config";
 import bcrypt from "bcrypt";
 import { TUser } from "./user.interface";
@@ -20,7 +19,7 @@ const userSchema = new Schema<TUser>({
       required: true,
     },
     premiumMembership: {
-      type: 'Boolean',
+      type: Boolean,
       default: false,
     },
     bio: {
@@ -40,10 +39,12 @@ const userSchema = new Schema<TUser>({
     followers: {
       type: [String],
       default: [],
+      ref:"User"
     },
     following: {
       type: [String],
       default: [],
+      ref:"User"
     },
     isBlocked: {
       type: Boolean,

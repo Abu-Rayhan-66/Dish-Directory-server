@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TRecipe } from "./recipe.interface";
 import RecipeModel from "./recipe.model";
 import { JwtPayload } from "jsonwebtoken";
@@ -122,8 +123,9 @@ const rateRecipeIntoDb = async (
 const commentRecipeIntoDb = async (
   recipeId: string,
   user: JwtPayload,
-  comment: string,
+  data: {name:string, image:string, comment:string},
 ) => {
+
   const recipe = await RecipeModel.findById(recipeId);
 
   if (!recipe) {
@@ -132,13 +134,12 @@ const commentRecipeIntoDb = async (
 
   recipe.comments.push({
     id: user.id,
-    name: user.name,
-    profilePicture: user.image,
-    comment: comment,
+    name: data.name,
+    profilePicture: data.image,
+    comment: data.comment,
   });
 
   const updatedRecipe = await recipe.save();
-
   return updatedRecipe;
 };
 
@@ -166,16 +167,36 @@ const editRecipeCommentIntoDb = async (
   return updatedRecipe;
 };
 
-const getAllRecipesFromDb = async () => {
-  const result = await RecipeModel.find({ isPublished: true });
+const deleteCommentFromDb = async(recipeId:string, commentId:string)=>{
 
+  const result = await RecipeModel.findByIdAndUpdate(
+    recipeId,
+    {
+      $pull: {
+        comments: { _id: commentId },  
+      },
+    },
+    { new: true }  
+  );
+  return result;
+}
+
+const getAllRecipesFromDb = async (userId: string) => {
+
+  const userData:any = await UserModel.findById(userId);
+  let result;
+  if (userData?.premiumMembership === true) {
+    result = await RecipeModel.find({ isPublished: true }).populate("user");
+  } else  {
+    result = await RecipeModel.find({ isPublished: true, isPremium: false }).populate("user");
+  }
   return result;
 };
 
 const getAllRecipesForAdminFromDb = async () => {
   const result = await RecipeModel.find();
-
   return result;
+  
 };
 
 const getSingleRecipeFromDb = async (recipeId:string) => {
@@ -186,6 +207,12 @@ const getSingleRecipeFromDb = async (recipeId:string) => {
 
 const deleteRecipeIntoDb = async (recipeId: string) => {
   const result = await RecipeModel.findByIdAndDelete(recipeId);
+
+  return result;
+};
+
+const updateRecipeIntoDb = async (payload:TRecipe, recipeId: string) => {
+  const result = await RecipeModel.findByIdAndUpdate(recipeId ,payload,);
 
   return result;
 };
@@ -222,10 +249,12 @@ export const recipeService = {
     rateRecipeIntoDb,
     commentRecipeIntoDb,
     editRecipeCommentIntoDb,
+    deleteCommentFromDb,
     getAllRecipesFromDb,
     getAllRecipesForAdminFromDb,
     getSingleRecipeFromDb,
     deleteRecipeIntoDb,
     publishRecipeIntoDb,
-    unpublishRecipeIntoDb
+    unpublishRecipeIntoDb,
+    updateRecipeIntoDb
 };

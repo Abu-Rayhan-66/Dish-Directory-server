@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TUser } from "./user.interface";
 import bcrypt from "bcrypt";
 import httpStatus from "http-status";
@@ -7,6 +8,7 @@ import { createToken } from "../../utils/createToken";
 import config from "../../config";
 import UserModel from "./user.model";
 import RecipeModel from "../recipe/recipe.model";
+
 
 
 
@@ -27,8 +29,14 @@ const getUserFromDB = async (data: { email: string; password: string }) => {
     .select("+password")
     .lean();
 
+    
+
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  if(user?.isBlocked === true){
+    throw new AppError(httpStatus.UNAUTHORIZED, "you have no right to login")
   }
 
   const match = await bcrypt.compare(data.password, user.password);
@@ -144,16 +152,55 @@ const removeFromFollowingIntoDb = async (id: string, user: JwtPayload) => {
 
 
 
-const getSingleUserWithPostedRecipeFromDb = async (id: string) => {
-  const userData = await UserModel.findById(id);
-  const userPostedRecipeData = await RecipeModel.find({ user: id });
+const getSingleUserWithPostedRecipeFromDb = async (id:string) => {
+
+  const userData = await UserModel.findById(id).populate("following").populate("followers");
+  const userPostedRecipeData = await RecipeModel.find({ user: id , isPublished:true,  });
 
   return { userData, userPostedRecipeData };
+};
+
+const getUserPostedRecipeFromDb = async (query:Record<string, unknown>) => {
+
+  const {id, searchTerm, priceFilter, skip = 0, limit = 10, sortBy, sortOrder } = query;
+
+  const filterConditions: Record<string, unknown> = {};
+
+  if (id) {
+    filterConditions.user = id;
+  }
+
+  if (searchTerm) {
+    filterConditions.$or = [
+      { title: { $regex: searchTerm, $options: "i" } },
+     
+    ];
+  }
+
+  if (priceFilter) {
+    filterConditions.cookingTime = priceFilter;
+  }
+
+  const sortConditions: Record<string, 1 | -1> = {};
+  if (typeof sortBy === "string") {
+    sortConditions[sortBy] = sortOrder === "asc" ? 1 : -1; 
+  }
+
+  return await RecipeModel.find(filterConditions)
+    .sort(sortConditions)
+    .skip(Number(skip))
+    .limit(Number(limit));
 };
 
 
 const getSingleUserFromDb = async (id: string) => {
   const userData = await UserModel.findById(id);
+
+  return userData;
+};
+
+const getSingleUserWithEmailFromDb = async (email: string) => {
+  const userData = await UserModel.findOne({email:email});
 
   return userData;
 };
@@ -257,7 +304,9 @@ export const UserServices = {
   addToFollowingIntoDb,
   removeFromFollowingIntoDb,
   getSingleUserWithPostedRecipeFromDb,
+  getUserPostedRecipeFromDb,
   getSingleUserFromDb,
+  getSingleUserWithEmailFromDb,
 
   getAllUserFromDb,
   blockUserIntoDb,

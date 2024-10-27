@@ -6,6 +6,7 @@ const RecipeSchema = new mongoose.Schema<TRecipe>(
     user: {
       type: String,
       required: true,
+      ref:"User"
     },
     title: {
       type: String,
@@ -15,10 +16,11 @@ const RecipeSchema = new mongoose.Schema<TRecipe>(
       type: String,
       required: true,
     },
-    content: {
-      type: String,
+    cookingTime: {
+      type: Number,
       required: true,
     },
+   
     upvote: {
       type: [String],
       required: true,
@@ -31,10 +33,11 @@ const RecipeSchema = new mongoose.Schema<TRecipe>(
     },
     comments: {
       type: [
-        { id: String, name: String, profilePicture: String, comment: String },
+        { id: String , name: String, profilePicture: String, comment: String },
       ],
       required: true,
       default: [],
+      
     },
     rating: {
       type: [{ id: String, rating: Number }],
@@ -44,7 +47,7 @@ const RecipeSchema = new mongoose.Schema<TRecipe>(
     isPublished: {
       type: Boolean,
       required: true,
-      default: true,
+      default: false,
     },
     isPremium: {
       type: Boolean,

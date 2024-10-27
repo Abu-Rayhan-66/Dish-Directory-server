@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { UserRoutes } from '../modules/user/user.route';
 import recipeRoute from '../modules/recipe/recipe.route';
+import passwordMutationRoute from '../modules/passwordMutation/passwordMutation.route';
 
 
 
@@ -14,6 +15,10 @@ const moduleRoutes = [
   {
     path: "/recipe",
     route: recipeRoute,
+  },
+  {
+    path: "/password",
+    route: passwordMutationRoute,
   },
   
  

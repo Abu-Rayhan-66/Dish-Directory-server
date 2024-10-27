@@ -64,8 +64,10 @@ const addComment = catchAsync(async(req, res) =>{
   const comment = await recipeService.commentRecipeIntoDb(
     req.params.recipeId,
     req.user,
-    req.body.comment,
+    req.body,
   );
+
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -91,9 +93,21 @@ const editRecipeComment = catchAsync(async(req, res) =>{
 })
 
 
+const deleteComment = catchAsync(async(req, res) =>{
+  const deleteComment = await recipeService.deleteCommentFromDb( req.params.recipeId, req.params.id);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "comment deleted successfully",
+    data: deleteComment,
+  })
+})
+
+
 
 const getAllRecipes = catchAsync(async(req, res) =>{
-  const result = await recipeService.getAllRecipesFromDb()
+  
+  const result = await recipeService.getAllRecipesFromDb(req.params.user)
 
   sendResponse(res, {
     success: true,
@@ -119,6 +133,7 @@ const getAllRecipesForAdmin = catchAsync(async(req, res) =>{
 const getSingleRecipe = catchAsync(async(req, res) =>{
   const result = await recipeService.getSingleRecipeFromDb(req.params.recipeId)
 
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -135,6 +150,19 @@ const deleteRecipe = catchAsync(async(req, res) =>{
     success: true,
     statusCode: httpStatus.CREATED,
     message: "Recipe deleted successfully",
+    data: result,
+  })
+
+})
+
+const updateRecipe = catchAsync(async(req, res) =>{
+  const result = await recipeService.updateRecipeIntoDb(req.body, req.params.recipeId)
+
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "Recipe updated successfully",
     data: result,
   })
 
@@ -172,11 +200,13 @@ export const recipeController = {
   rateRecipe,
   addComment,
   editRecipeComment,
+  deleteComment,
   getAllRecipes,
   getAllRecipesForAdmin,
   getSingleRecipe,
   deleteRecipe,
   publishRecipe,
-  unPublishRecipe
+  unPublishRecipe,
+  updateRecipe
 
 };

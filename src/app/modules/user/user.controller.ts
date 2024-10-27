@@ -77,11 +77,49 @@ const createUser = catchAsync(async (req, res)=>{
   });
 
  const getSingleUserWithPostedRecipe = catchAsync(async (req, res) => {
-    const result = await UserServices.getSingleUserWithPostedRecipeFromDb(req.params.id,);
+  const {id }=  req.params
+
+ 
+    const result = await UserServices.getSingleUserWithPostedRecipeFromDb(id);
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.CREATED,
       message: "User retrieve with posted recipe successfully",
+      data: result,
+    });
+  });
+
+
+ const getUserPostedRecipe = catchAsync(async (req, res) => {
+
+  const id = req.user.id
+  
+  const { searchTerm, minPrice, maxPrice, page = 1, limit = 10, sortBy, sortOrder } = req.query;
+  const parsedLimit = Number(limit) || 10; 
+  const parsedPage = Number(page) || 1; 
+  const skip = (parsedPage - 1) * parsedLimit; 
+
+  
+
+  const priceFilter: Record<string, unknown> = {};
+  if (minPrice) priceFilter.$gte = Number(minPrice);
+  if (maxPrice) priceFilter.$lte = Number(maxPrice);
+
+    const result = await UserServices.getUserPostedRecipeFromDb({
+      id,
+       searchTerm: searchTerm || "",
+       priceFilter: Object.keys(priceFilter).length ? priceFilter : null,
+       skip,
+       limit:parsedLimit,
+       sortBy,
+       sortOrder
+    }
+      
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "UserS posted recipe retrieve successfully",
       data: result,
     });
   });
@@ -96,6 +134,16 @@ const createUser = catchAsync(async (req, res)=>{
     });
   });
 
+ const getSingleUserWithEmail = catchAsync(async (req, res) => {
+    const result = await UserServices.getSingleUserWithEmailFromDb(req.body.email,);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "User retrieve by email successfully",
+      data: result,
+    });
+  });
+
  const getAllUser = catchAsync(async (req, res) => {
     const result = await UserServices.getAllUserFromDb();
     sendResponse(res, {
@@ -105,6 +153,7 @@ const createUser = catchAsync(async (req, res)=>{
       data: result,
     });
   });
+
 
  const blockUser = catchAsync(async (req, res) => {
     const result = await UserServices.blockUserIntoDb(req.params.id);
@@ -196,7 +245,9 @@ export const UserController = {
     followUser,
     removeFollowedUser,
     getSingleUserWithPostedRecipe,
+    getUserPostedRecipe,
     getSingleUser,
+    getSingleUserWithEmail,
     getAllUser,
     blockUser,
     unblockUser,
@@ -205,7 +256,8 @@ export const UserController = {
     getAllAdmin,
     getSingleAdmin,
     updateAdmin,
-    deleteAdmin
+    deleteAdmin,
+   
 
 
 

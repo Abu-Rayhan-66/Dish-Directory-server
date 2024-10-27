@@ -9,10 +9,14 @@ export const createRecipeValidation = z.object({
         image: z.string({
        required_error: "image is required",
         }),
-        content: z.string({
-       required_error: "content is required",
-
-})
+        cookingTime: z.number({
+       required_error: "cooking is required",
+        }),
+        
+       isPremium: z.boolean({
+       required_error: "isPremium is required",
+        }),
+        
  
 });
 
