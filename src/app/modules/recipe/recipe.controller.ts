@@ -50,6 +50,7 @@ const rateRecipe = catchAsync(async(req,res) =>{
     req.body.rating,
   );
 
+ 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -84,6 +85,7 @@ const editRecipeComment = catchAsync(async(req, res) =>{
     req.params.commentId,
     req.body.comment,
   );
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -106,8 +108,20 @@ const deleteComment = catchAsync(async(req, res) =>{
 
 
 const getAllRecipes = catchAsync(async(req, res) =>{
+
+  const { searchTerm, minPrice, maxPrice,  sortBy, sortOrder, id} = req.query;
+ 
+  const priceFilter: Record<string, unknown> = {};
+  if (minPrice) priceFilter.$gte = Number(minPrice);
+  if (maxPrice) priceFilter.$lte = Number(maxPrice);
   
-  const result = await recipeService.getAllRecipesFromDb(req.params.user)
+  const result = await recipeService.getAllRecipesFromDb({
+       userId: id,
+       searchTerm: searchTerm || "",
+       priceFilter: Object.keys(priceFilter).length ? priceFilter : null,
+       sortBy,
+       sortOrder
+  })
 
   sendResponse(res, {
     success: true,
@@ -137,9 +151,9 @@ const getSingleRecipe = catchAsync(async(req, res) =>{
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: "Specific recipes retrieve successfully",
+    message: "Single recipe retrieve successfully",
     data: result,
-  })
+  });
 
 })
 

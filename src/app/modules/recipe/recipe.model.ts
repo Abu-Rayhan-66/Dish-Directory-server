@@ -31,6 +31,10 @@ const RecipeSchema = new mongoose.Schema<TRecipe>(
       required: true,
       default: [],
     },
+    upvoteCount:{
+      type:Number,
+      default:0
+    },
     comments: {
       type: [
         { id: String , name: String, profilePicture: String, comment: String },
@@ -48,6 +52,16 @@ const RecipeSchema = new mongoose.Schema<TRecipe>(
       type: Boolean,
       required: true,
       default: false,
+    },
+    ingredient: {
+      type:String,
+      
+     
+    },
+    description: {
+      type:String,
+      
+     
     },
     isPremium: {
       type: Boolean,

@@ -79,7 +79,6 @@ const createUser = catchAsync(async (req, res)=>{
  const getSingleUserWithPostedRecipe = catchAsync(async (req, res) => {
   const {id }=  req.params
 
- 
     const result = await UserServices.getSingleUserWithPostedRecipeFromDb(id);
     sendResponse(res, {
       success: true,
@@ -98,8 +97,6 @@ const createUser = catchAsync(async (req, res)=>{
   const parsedLimit = Number(limit) || 10; 
   const parsedPage = Number(page) || 1; 
   const skip = (parsedPage - 1) * parsedLimit; 
-
-  
 
   const priceFilter: Record<string, unknown> = {};
   if (minPrice) priceFilter.$gte = Number(minPrice);

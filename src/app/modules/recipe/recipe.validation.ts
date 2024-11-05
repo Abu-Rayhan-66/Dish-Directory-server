@@ -16,6 +16,12 @@ export const createRecipeValidation = z.object({
        isPremium: z.boolean({
        required_error: "isPremium is required",
         }),
+       ingredient: z.string({
+       required_error: "ingredient is required",
+        }).optional(),
+       description: z.string({
+       required_error: "description is required",
+        }).optional(),
         
  
 });

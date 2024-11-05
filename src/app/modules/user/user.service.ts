@@ -153,12 +153,14 @@ const removeFromFollowingIntoDb = async (id: string, user: JwtPayload) => {
 
 
 const getSingleUserWithPostedRecipeFromDb = async (id:string) => {
-
   const userData = await UserModel.findById(id).populate("following").populate("followers");
-  const userPostedRecipeData = await RecipeModel.find({ user: id , isPublished:true,  });
+
+   const userPostedRecipeData = await RecipeModel.find({ user: id , isPublished:true});
+  
 
   return { userData, userPostedRecipeData };
 };
+
 
 const getUserPostedRecipeFromDb = async (query:Record<string, unknown>) => {
 

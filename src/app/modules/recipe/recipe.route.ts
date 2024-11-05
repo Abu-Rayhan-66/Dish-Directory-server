@@ -8,9 +8,9 @@ import { recipeController } from "./recipe.controller";
 const recipeRoute = express.Router();
 
 recipeRoute.get('/admin-recipe', auth('admin'), recipeController.getAllRecipesForAdmin);
-recipeRoute.get('/:user', recipeController.getAllRecipes);
-
+recipeRoute.get('/user-recipe', recipeController.getAllRecipes);
 recipeRoute.get('/single-recipe/:recipeId',auth('user'), recipeController.getSingleRecipe);
+
 recipeRoute.delete('/:recipeId',auth('user', 'admin'), recipeController.deleteRecipe);
 recipeRoute.patch('/update-recipe/:recipeId', recipeController.updateRecipe);
 recipeRoute.patch('/publish/:recipeId',auth( 'admin'), recipeController.publishRecipe);

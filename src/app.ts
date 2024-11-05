@@ -15,8 +15,8 @@ app.use(express.static(path.join(__dirname,"../public")))
 
 app.use(express.json());
 
-// app.use(cors({origin:"http://localhost:3000", credentials:true}));
-app.use(cors({origin:"https://dish-directory-client.vercel.app", credentials:true}));
+app.use(cors({origin:"http://localhost:3000", credentials:true}));
+// app.use(cors({origin:"https://dish-directory-client.vercel.app", credentials:true}));
 
 // application routes
 app.use("/api", router);

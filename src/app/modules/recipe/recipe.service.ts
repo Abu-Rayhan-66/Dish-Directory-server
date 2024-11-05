@@ -98,6 +98,7 @@ const rateRecipeIntoDb = async (
   user: JwtPayload,
   newRating: number,
 ) => {
+
   const recipe = await RecipeModel.findById(recipeId);
 
   if (!recipe) {
@@ -113,6 +114,8 @@ const rateRecipeIntoDb = async (
   } else {
     recipe.rating.push({ id: user.id, rating: newRating });
   }
+
+
 
   const updatedRecipe = await recipe.save();
 
@@ -181,17 +184,47 @@ const deleteCommentFromDb = async(recipeId:string, commentId:string)=>{
   return result;
 }
 
-const getAllRecipesFromDb = async (userId: string) => {
+const getAllRecipesFromDb = async (query: Record<string, unknown>) => {
+  const { userId, searchTerm, priceFilter, sortBy, sortOrder } = query;
+  console.log("query from service", query);
 
-  const userData:any = await UserModel.findById(userId);
-  let result;
+  const filterConditions: Record<string, unknown> = {};
+
+  // Set filtering conditions based on user membership status
+  const userData: any = userId && userId !== "undefined" ? await UserModel.findById(userId) : null;
   if (userData?.premiumMembership === true) {
-    result = await RecipeModel.find({ isPublished: true }).populate("user");
-  } else  {
-    result = await RecipeModel.find({ isPublished: true, isPremium: false }).populate("user");
+    filterConditions.isPublished = true;
+  } else {
+    filterConditions.isPremium = false;
+    filterConditions.isPublished = true;
   }
+
+  // Apply search term filter
+  if (searchTerm) {
+    filterConditions.$or = [
+      { title: { $regex: searchTerm, $options: "i" } },
+    ];
+  }
+
+  // Apply price filter
+  if (priceFilter) {
+    filterConditions.cookingTime = priceFilter;
+  }
+
+  // Set sorting conditions
+  const sortConditions: Record<string, 1 | -1> = {};
+  if (typeof sortBy === "string") {
+    sortConditions[sortBy] = sortOrder === "asc" ? -1 : 1;
+  }
+
+  // Find recipes based on filter and sort conditions
+  const result = await RecipeModel.find(filterConditions)
+    .populate("user")
+    .sort(sortConditions);
+
   return result;
 };
+
 
 const getAllRecipesForAdminFromDb = async () => {
   const result = await RecipeModel.find();
